@@ -1,16 +1,18 @@
 # flutter_login_ui
 
-A new Flutter project.
+To integrate Firebase with your Flutter project, you have to create a new Firebase project by going to the console.
 
-## Getting Started
+Add a new project and give it a name. We don’t need Google Analytics for this sample project, so you can disable it. Once you’ve created your project, you’ll be directed to your Firebase project dashboard.
+Set up Firebase for Firebase.
+follow the below images 
 
-This project is a starting point for a Flutter application.
+Import Firebase plugins
+Before you start to implement the authentication logic, you need to import the following plugins:
 
-A few resources to get you started if this is your first Flutter project:
+firebase_core, which is required to use any Firebase service in a Flutter app
+firebase_auth to get access to Firebase Authentication services
+Add these plugins to your pubspec.yaml file:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+dependencies:
+firebase_core: ^1.0.4
+firebase_auth: ^1.1.1

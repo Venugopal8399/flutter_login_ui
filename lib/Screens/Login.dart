@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_login_ui/Authenticator/fire_auth.dart';
 import 'package:flutter_login_ui/Page%20Transition/page_transition.dart';
 import 'package:flutter_login_ui/Screens/Navigation_Bar/Home.dart';
 import 'package:flutter_login_ui/Screens/Register.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_login_ui/Validator/validator.dart';
+import 'package:firebase_core/firebase_core.dart';
 class Login extends StatefulWidget {
   const Login({super.key});
 
@@ -11,6 +14,11 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final _formKey = GlobalKey<FormState>();
+  Future<FirebaseApp> _initializeFirebase() async {
+    FirebaseApp firebaseApp = await Firebase.initializeApp();
+    return firebaseApp;
+  }
   bool passwordVisible = false;
   String errorMessage = '';
   String successMessage = '';
@@ -20,6 +28,12 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     passwordVisible = true;
+  }
+  @override
+  void dispose() {
+   _emailIdController.dispose();
+   _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -54,8 +68,8 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
+                Form(
+                  key: _formKey,
                   child: Container(
                     margin: EdgeInsets.all(25),
                     child: Expanded(
@@ -64,7 +78,7 @@ class _LoginState extends State<Login> {
                         children: [
                           // Email id TextField
                           TextFormField(
-                             validator: (val) => val!.isEmpty ? 'E-Mail can\'t be empty.' : null,
+                             validator: (val) => Validator.validateEmail(email: _emailIdController.text.toString().trim()),
                             keyboardType: TextInputType.emailAddress,
                             controller: _emailIdController,
                             decoration: InputDecoration(
@@ -77,7 +91,7 @@ class _LoginState extends State<Login> {
                           ),
                           // Password Text Form Field
                           TextFormField(
-                            validator: (val) => val!.isEmpty ? 'Password can\'t be empty.' : null,
+                            validator: (val) => Validator.validatePassword(password: _passwordController.text.toString().trim()),
                             keyboardType: TextInputType.visiblePassword,
                             controller: _passwordController,
                             obscureText: passwordVisible,
@@ -112,8 +126,19 @@ class _LoginState extends State<Login> {
                         shape: CircleBorder(),padding: EdgeInsets.all(26),
                           primary: Colors.black,
                       ),
-                      onPressed: () {
-                        Navigator.push(context, PageTransition(child: Home()));
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          User? user = await FireAuth.signInUsingEmailPassword(
+                            email: _emailIdController.text,
+                            password: _passwordController.text,
+                          );
+                          if (user != null) {
+                            Navigator.of(context)
+                                .pushReplacement(
+                              MaterialPageRoute(builder: (context) => Home()),
+                            );
+                          }
+                        }
                       }, child: Text('Sign In',style: TextStyle(
                       color: Colors.white,fontFamily: 'Rubik',
                   ),)),
@@ -143,5 +168,6 @@ class _LoginState extends State<Login> {
       ),
     );
   }
+
 }
 
